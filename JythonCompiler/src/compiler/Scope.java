@@ -10,19 +10,23 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 
 public class Scope{
-    private Hashtable<String,Object> symbol_table;
+    private Hashtable<String,itemAttribute> symbol_table;
     private Scope parent=null;
+    private ArrayList<Scope> children;
 
     public Scope(){
-        this.symbol_table=new Hashtable<String, Object>();
+        this.symbol_table=new Hashtable<String, itemAttribute>();
     }
-    public Scope setParent(Scope parent){
+    public void setParent(Scope parent){
         this.parent=parent;
-        return this;
     }
     public Scope getParent(Scope parent){
         return this.parent;
     }
+    public void appendChild(Scope child){
+        children.add(child);
+    }
+    public Scope getChild(int index){return this.children.get(index);}
     public void insert(String idefName , itemAttribute attributes){
         symbol_table.put(idefName,attributes);
     }

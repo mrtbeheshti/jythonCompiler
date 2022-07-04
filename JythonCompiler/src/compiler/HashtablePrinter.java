@@ -22,9 +22,11 @@ public class HashtablePrinter implements jythonListener{
 
     @Override
     public void enterImportclass(jythonParser.ImportclassContext ctx) {
-        currentScope = new Scope().setParent(currentScope);
-        itemAttribute
-        currentScope.insert("import_"+ctx.imprtedClass.getText(),);
+        Scope new_child=new Scope();
+        new_child.setParent(currentScope);
+        currentScope.appendChild(new_child);
+        currentScope=new_child;
+        currentScope.insert("import_"+ctx.imprtedClass.getText(),null);
     }
 
     @Override
