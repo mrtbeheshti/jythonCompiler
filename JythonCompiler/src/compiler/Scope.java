@@ -13,14 +13,16 @@ public class Scope{
     private Hashtable<String,itemAttribute> symbol_table;
     private Scope parent=null;
     private ArrayList<Scope> children;
+    private int entryLine;
 
-    public Scope(){
+    public Scope(int line){
         this.symbol_table=new Hashtable<String, itemAttribute>();
+        this.entryLine = line;
     }
     public void setParent(Scope parent){
         this.parent=parent;
     }
-    public Scope getParent(Scope parent){
+    public Scope getParent(){
         return this.parent;
     }
     public void appendChild(Scope child){
@@ -29,5 +31,8 @@ public class Scope{
     public Scope getChild(int index){return this.children.get(index);}
     public void insert(String idefName , itemAttribute attributes){
         symbol_table.put(idefName,attributes);
+    }
+    public int getEntryLine(){
+        return this.entryLine;
     }
 }

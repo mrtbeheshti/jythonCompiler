@@ -10,9 +10,11 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 
 public class HashtablePrinter implements jythonListener{
     private Scope currentScope;
+    private int tempLine = 0;
+
     @Override
     public void enterProgram(jythonParser.ProgramContext ctx) {
-        currentScope=new Scope();
+        currentScope=new Scope(tempLine);
     }
 
     @Override
@@ -22,7 +24,7 @@ public class HashtablePrinter implements jythonListener{
 
     @Override
     public void enterImportclass(jythonParser.ImportclassContext ctx) {
-        Scope new_child=new Scope();
+        Scope new_child=new Scope(tempLine);
         new_child.setParent(currentScope);
         currentScope.appendChild(new_child);
         currentScope=new_child;
@@ -31,12 +33,16 @@ public class HashtablePrinter implements jythonListener{
 
     @Override
     public void exitImportclass(jythonParser.ImportclassContext ctx) {
-
+        currentScope = currentScope.getParent();
     }
 
     @Override
     public void enterClassDef(jythonParser.ClassDefContext ctx) {
-
+        Scope child=new Scope(tempLine);
+        child.setParent(currentScope);
+        currentScope.appendChild(child);
+        currentScope=child;
+        currentScope.insert("Class_"+ctx.className.getText(),null);
     }
 
     @Override
