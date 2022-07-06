@@ -82,7 +82,7 @@ public class ErrorDetector {
         printError();
     }
 
-    private static void printError(){
-
+    private static String printError(String type, String line, String column, String text){
+        System.out.println("Error" + type + " : in line " + line + ":" + column + " , " + text;);
     }
 }

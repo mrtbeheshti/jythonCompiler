@@ -25,7 +25,7 @@ public class HashtablePrinter implements jythonListener{
         Queue<Scope> scopes = new LinkedList<>();
         scopes.add(this.currentScope);
         while(scopes.size()>0){
-            Scope scope_to_print = scopes.peek();
+            Scope scope_to_print = scopes.poll();
             for(int i=0;i<scope_to_print.childrenCount();i++){
                 scopes.add(scope_to_print.getChild(i));
             }
@@ -52,7 +52,7 @@ public class HashtablePrinter implements jythonListener{
 
     @Override
     public void enterClassDef(jythonParser.ClassDefContext ctx) {
-        itemAttribute attrs = new itemAttribute(ctx.className.getLine(), ctx.className.getText(),
+        itemAttribute attrs = new itemAttribute(ctx.start.getLine(), ctx.className.getText(),
         false,true,false,false,false,false);
         
         attrs.setStructureType("Class");
@@ -62,7 +62,7 @@ public class HashtablePrinter implements jythonListener{
 
         currentScope.insert("Class_"+ctx.className.getText(),attrs);
 
-        Scope child=new Scope(ctx.className.getLine(), ctx.className.getText());
+        Scope child=new Scope(ctx.start.getLine(), ctx.className.getText());
         child.setParent(currentScope);
         currentScope.appendChild(child);
         currentScope=child;
@@ -76,11 +76,22 @@ public class HashtablePrinter implements jythonListener{
 
     @Override
     public void enterVarDec(jythonParser.VarDecContext ctx) {
-        itemAttribute attrs = new itemAttribute(ctx.name.getLine(), ctx.name.getText(),
+        itemAttribute attrs = new itemAttribute(ctx.start.getLine(), ctx.name.getText(),
         false,false,true,false,false,false);
+        attrs.setVariableType(ctx.type.getText());
+        currentScope.insert("Field_"+ctx.name.getText(),attrs);
         if(isParam){
             attrs.setStructureType("Parameter");
-            this.currentScope.getLastItem().addParameter(ctx.type.getText());
+            itemAttribute parentAttribute = null;
+            String parentName = this.currentScope.getName();
+            String method = "Method_"+parentName;
+
+            String constructor = "Constructor_"+parentName;
+            if (this.currentScope.getParent().getsymbolTableValue(method) !=null)
+                parentAttribute = this.currentScope.getParent().getsymbolTableValue(method);
+            else
+                parentAttribute = this.currentScope.getParent().getsymbolTableValue(constructor);
+            parentAttribute.addParameter(ctx.type.getText());
         }else{
 
             if(ctx.type.getText().contains("class")){
@@ -90,8 +101,6 @@ public class HashtablePrinter implements jythonListener{
             }
 
         }
-        attrs.setVariableType(ctx.type.getText());
-        currentScope.insert("Field_"+ctx.name.getText(),attrs);
     }
 
     @Override
@@ -99,16 +108,16 @@ public class HashtablePrinter implements jythonListener{
 
     @Override
     public void enterArrayDec(jythonParser.ArrayDecContext ctx) {
-        itemAttribute attrs = new itemAttribute(ctx.name.getLine(), ctx.name.getText(),
+        itemAttribute attrs = new itemAttribute(ctx.start.getLine(), ctx.name.getText(),
         false,false,true,false,false,false);
         attrs.setVariableType(ctx.type.getText());
-        if(ctx.type.getText().contains("class")){
+        if(ctx.CLASSNAME() != null){
             attrs.setStructureType("ClassArrayField");
-        }else{
+        }else if(ctx.TYPE() != null){
             attrs.setStructureType("ArrayField");
         }
 
-        currentScope.insert("Field_"+ctx.name.getText(),null);
+        currentScope.insert("Field_"+ctx.name.getText(),attrs);
     }
 
     @Override
@@ -116,16 +125,17 @@ public class HashtablePrinter implements jythonListener{
 
     @Override
     public void enterMethodDec(jythonParser.MethodDecContext ctx) {
-        itemAttribute attrs = new itemAttribute(ctx.name.getLine(), ctx.name.getText(),
+        itemAttribute attrs = new itemAttribute(ctx.start.getLine(), ctx.name.getText(),
         false,false,false,true,false,false);
 
         attrs.setStructureType("Method");
-        attrs.setReturnType(ctx.type.getText());
+        String type = (ctx.type!=null)? ctx.type.getText() : "void";
+        attrs.setReturnType(type);
 
         currentScope.insert("Method_"+ctx.name.getText(),attrs);
         paramIndex = 0;
 
-        Scope child=new Scope(ctx.name.getLine(), ctx.type.getText());
+        Scope child=new Scope(ctx.start.getLine(), ctx.name.getText());
         child.setParent(currentScope);
         currentScope.appendChild(child);
         currentScope=child;

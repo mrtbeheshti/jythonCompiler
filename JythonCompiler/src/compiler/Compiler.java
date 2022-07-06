@@ -14,8 +14,8 @@ import java.io.IOException;
 
 public class Compiler {
     public static void main(String[] args) throws IOException {
-        // String path = "D:\\mr\\Compiler\\Proj1\\Jython\\JythonCompiler\\sample\\test.jy";
-        String path = "sample\\test.jy";
+        String path = "D:\\mr\\Compiler\\Proj1\\Jython\\JythonCompiler\\sample\\test.jy";
+//        String path = ".\\sample\\test.jy";
         CharStream stream = CharStreams.fromFileName(path);
         jythonLexer lexer=new jythonLexer(stream);
         TokenStream tokens = new CommonTokenStream(lexer);
@@ -23,7 +23,7 @@ public class Compiler {
         parser.setBuildParseTree(true);
         ParseTree tree = parser.program();
         ParseTreeWalker walker=new ParseTreeWalker();
-        jythonListener listener=new ProgramPrinter();
+        jythonListener listener=new HashtablePrinter();
 
         walker.walk(listener,tree);
         

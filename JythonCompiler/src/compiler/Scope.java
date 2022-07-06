@@ -18,12 +18,16 @@ public class Scope{
         this.children = new ArrayList<>();
         this.entryLine = line;
         this.name = name;
+
     }
     public Object[] getSymbolTableKeys(){
         return this.symbolTable.keySet().toArray();
     }
     public itemAttribute getsymbolTableValue(String key){
         return this.symbolTable.get(key);
+    }
+    public ArrayList<Scope> getChildrenArrayList(){
+        return this.children;
     }
     public void setParent(Scope parent){
         this.parent=parent;
@@ -41,9 +45,9 @@ public class Scope{
         return this.last_item;
     }
     public Scope getChild(int index){return this.children.get(index);}
-    public void insert(String idefName , itemAttribute attribute){
+    public void insert(String idfName , itemAttribute attribute){
         this.last_item=attribute;
-        symbolTable.put(idefName,attribute);
+        symbolTable.put(idfName,attribute);
     }
     public int getEntryLine(){
         return this.entryLine;

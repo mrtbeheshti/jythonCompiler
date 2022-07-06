@@ -18,7 +18,7 @@ public class itemAttribute {
     private boolean isVariable;
     private String variableType;
     private boolean isMethod;
-    private List<String> parameterList;
+    private ArrayList<String> parameterList;
     private String returnType;
     private boolean isDefined;
     private boolean isConstructor;
@@ -32,6 +32,9 @@ public class itemAttribute {
         this.isDefined = isDefined;
         this.isImport = isImport;
         this.isConstructor = isConstructor;
+        if(isMethod || isConstructor){
+            this.parameterList = new ArrayList<String>();
+        }
         if(isClass){
             this.classParents = new ArrayList<String>();
         }
@@ -52,7 +55,7 @@ public class itemAttribute {
     public void addParameter(String param){
         this.parameterList.add(param);
     }
-    public void setParameterList(List<String> params){
+    public void setParameterList(ArrayList<String> params){
         if(this.isMethod || this.isConstructor)
             this.parameterList = params;
     }
@@ -145,8 +148,8 @@ public class itemAttribute {
                 case "int":
                 case "float":
                 case "string":
-                case "bool": ret_str += this.returnType; break;
-                default: ret_str += "type= " + this.returnType;
+                case "bool": ret_str += this.variableType; break;
+                default: ret_str += "type= " + this.variableType;
             }
             ret_str +="], [isDefined: " + (this.isDefined?"True":"False") + "])";
         }
