@@ -1,5 +1,9 @@
 package compiler;
 
+import java.util.List;
+
+import gen.jythonParser.ParameterContext;
+
 public class itemAttribute {
     private int line;
     private String name;
@@ -9,38 +13,34 @@ public class itemAttribute {
     private boolean isVariable;
     private String variableType;
     private boolean isMethod;
+    private List<ParameterContext> parameterList;
     private String returnType;
     private boolean isDefined;
 
-    public void setLine(int line){
+    public itemAttribute(int line, String name,boolean isClass, boolean isVariable, boolean isMethod, boolean isDefined){
         this.line = line;
-    }
-    public void setName(String name){
         this.name = name;
+        this.isClass = isClass;
+        this.isVariable = isVariable;
+        this.isMethod = isMethod;
+        this.isDefined = isDefined;
     }
+
+    
     public void setStructureType(String structureType){
         this.structureType = structureType;
-    }
-    public void setIsClass(boolean isClass){
-        this.isClass = isClass;
     }
     public void setClassType(String classType){
         this.classType = classType;
     }
-    public void setIsVariable(boolean isVariable){
-        this.isVariable = isVariable;
-    }
     public void setVariableType(String variableType){
         this.variableType = variableType;
     }
-    public void setIsMethod(boolean isMethod){
-        this.isMethod = isMethod;
+    public void setParameterList(List<ParameterContext> params){
+        this.parameterList = params;
     }
     public void setReturnType(String returnType){
         this.returnType = returnType;
-    }
-    public void setIsIsDefined(boolean isDefined){
-        this.isDefined = isDefined;
     }
 
     
@@ -67,6 +67,9 @@ public class itemAttribute {
     }
     public boolean getIsMethod(boolean isMethod){
         return this.isMethod;
+    }
+    public List<ParameterContext> getParameterList(){
+        return this.parameterList;
     }
     public String getReturnType(String returnType){
         return this.returnType;

@@ -23,6 +23,9 @@ public class Scope{
     public Object[] getSymbolTableKeys(){
         return this.symbolTable.keySet().toArray();
     }
+    public itemAttribute getsymbolTableValue(String key){
+        return this.symbolTable.get(key);
+    }
     public void setParent(Scope parent){
         this.parent=parent;
     }
