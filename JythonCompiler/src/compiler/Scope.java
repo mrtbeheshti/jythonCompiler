@@ -1,12 +1,9 @@
 package compiler;
-import gen.jythonListener;
-import gen.jythonParser;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.tree.ErrorNode;
-import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Map.Entry;
+import java.util.Set;
 
 public class Scope{
     private String name;
@@ -36,7 +33,6 @@ public class Scope{
     public void appendChild(Scope child){
         children.add(child);
     }
-    public ArrayList<Scope> getChildrenArrayList(){return this.children;}
     public Scope getChild(int index){return this.children.get(index);}
     public void insert(String idefName , itemAttribute attributes){
         symbolTable.put(idefName,attributes);
@@ -48,7 +44,7 @@ public class Scope{
         return this.name;
     }
     public String toString(){
-        return "";
+        
     }
     
 }
