@@ -20,7 +20,7 @@ public class HashtablePrinter implements jythonListener{
 
     @Override
     public void exitProgram(jythonParser.ProgramContext ctx) {
-
+        System.out.println(currentScope.toString());  
     }
 
     @Override
