@@ -47,7 +47,7 @@ public class HashtablePrinter implements jythonListener{
 
     @Override
     public void exitClassDef(jythonParser.ClassDefContext ctx) {
-
+        currentScope = currentScope.getParent();
     }
 
     @Override
@@ -62,42 +62,66 @@ public class HashtablePrinter implements jythonListener{
 
     @Override
     public void enterVarDec(jythonParser.VarDecContext ctx) {
-
+        Scope child=new Scope(tempLine);
+        child.setParent(currentScope);
+        currentScope.appendChild(child);
+        currentScope=child;
+        currentScope.insert("Field_"+ctx.name.getText(),null);
     }
 
     @Override
     public void exitVarDec(jythonParser.VarDecContext ctx) {
-
+        currentScope = currentScope.getParent();
     }
 
     @Override
     public void enterArrayDec(jythonParser.ArrayDecContext ctx) {
-
+        Scope child=new Scope(tempLine);
+        child.setParent(currentScope);
+        currentScope.appendChild(child);
+        currentScope=child;
+        currentScope.insert("Field_"+ctx.name.getText(),null);
     }
 
     @Override
     public void exitArrayDec(jythonParser.ArrayDecContext ctx) {
-
+        currentScope = currentScope.getParent();
     }
 
     @Override
     public void enterMethodDec(jythonParser.MethodDecContext ctx) {
-
+        Scope child=new Scope(tempLine);
+        child.setParent(currentScope);
+        currentScope.appendChild(child);
+        currentScope=child;
+        currentScope.insert("Method_"+ctx.name.getText(),null);
     }
 
     @Override
     public void exitMethodDec(jythonParser.MethodDecContext ctx) {
-
+        currentScope = currentScope.getParent();
     }
 
     @Override
     public void enterConstructor(jythonParser.ConstructorContext ctx) {
-
+        Scope child=new Scope(tempLine);
+        child.setParent(currentScope);
+        currentScope.appendChild(child);
+        currentScope=child;
+        String className = "";
+        for(Object key : currentScope.getParent().getSymbolTableKeys()){
+            String str = (String)key;
+            if (str.contains("lass")){
+                className = str.substring(str.indexOf("_")+1, str.length());
+                break;
+            }
+        }
+        currentScope.insert("Constructor_"+className,null);
     }
 
     @Override
     public void exitConstructor(jythonParser.ConstructorContext ctx) {
-
+        currentScope = currentScope.getParent();
     }
 
     @Override
@@ -152,32 +176,44 @@ public class HashtablePrinter implements jythonListener{
 
     @Override
     public void enterIf_statment(jythonParser.If_statmentContext ctx) {
-
+        Scope child=new Scope(tempLine);
+        child.setParent(currentScope);
+        currentScope.appendChild(child);
+        currentScope=child;
+        currentScope.insert("Method_"+ctx.name.getText(),null);
     }
 
     @Override
     public void exitIf_statment(jythonParser.If_statmentContext ctx) {
-
+        currentScope = currentScope.getParent();
     }
 
     @Override
     public void enterWhile_statment(jythonParser.While_statmentContext ctx) {
-
+        Scope child=new Scope(tempLine);
+        child.setParent(currentScope);
+        currentScope.appendChild(child);
+        currentScope=child;
+        currentScope.insert("Method_"+ctx.name.getText(),null);
     }
 
     @Override
     public void exitWhile_statment(jythonParser.While_statmentContext ctx) {
-
+        currentScope = currentScope.getParent();
     }
 
     @Override
     public void enterIf_else_statment(jythonParser.If_else_statmentContext ctx) {
-
+        Scope child=new Scope(tempLine);
+        child.setParent(currentScope);
+        currentScope.appendChild(child);
+        currentScope=child;
+        currentScope.insert("Method_"+ctx.name.getText(),null);
     }
 
     @Override
     public void exitIf_else_statment(jythonParser.If_else_statmentContext ctx) {
-
+        currentScope = currentScope.getParent();
     }
 
     @Override
@@ -192,12 +228,16 @@ public class HashtablePrinter implements jythonListener{
 
     @Override
     public void enterFor_statment(jythonParser.For_statmentContext ctx) {
-
+        Scope child=new Scope(tempLine);
+        child.setParent(currentScope);
+        currentScope.appendChild(child);
+        currentScope=child;
+        currentScope.insert("Method_"+ctx.name.getText(),null);
     }
 
     @Override
     public void exitFor_statment(jythonParser.For_statmentContext ctx) {
-
+        currentScope = currentScope.getParent();
     }
 
     @Override
