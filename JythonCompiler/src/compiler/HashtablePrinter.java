@@ -31,8 +31,8 @@ public class HashtablePrinter implements jythonListener{
             }
             print_str += scope_to_print.toString();
         }
-        ErrorDetector.duplicateFieldError(currentScope);
-        ErrorDetector.duplicateMethodError(currentScope);
+        
+        
         System.out.println(print_str);
     }
 
@@ -107,6 +107,8 @@ public class HashtablePrinter implements jythonListener{
             }
 
         }
+        ErrorDetector.notDefinedVariableError(currentScope, ctx.name.getText(), ctx.start.getLine(), 8);
+        ErrorDetector.duplicateFieldError(currentScope, ctx.name.getText(), ctx.start.getLine(),12);
     }
 
     @Override
@@ -145,6 +147,7 @@ public class HashtablePrinter implements jythonListener{
         child.setParent(currentScope);
         currentScope.appendChild(child);
         currentScope=child;
+        ErrorDetector.duplicateMethodError(currentScope, ctx.name.getText(), ctx.start.getLine(), 13);
     }
 
     @Override

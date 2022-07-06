@@ -69,6 +69,9 @@ public class itemAttribute {
             
         }
     }
+    public void setName(String name){
+        this.name = name;
+    }
 
     
 
