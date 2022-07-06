@@ -17,6 +17,7 @@ public class Scope{
 
     public Scope(int line, String name){
         this.symbolTable=new Hashtable<String, itemAttribute>();
+        this.children = new ArrayList<>();
         this.entryLine = line;
         this.name = name;
     }
@@ -35,6 +36,7 @@ public class Scope{
     public void appendChild(Scope child){
         children.add(child);
     }
+    public ArrayList<Scope> getChildrenArrayList(){return this.children;}
     public Scope getChild(int index){return this.children.get(index);}
     public void insert(String idefName , itemAttribute attributes){
         symbolTable.put(idefName,attributes);

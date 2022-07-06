@@ -75,7 +75,7 @@ public class itemAttribute {
     public int getLine(){
         return this.line;
     }
-    public String getname(){
+    public String getName(){
         return this.name;
     }
     public boolean getIsImport(){

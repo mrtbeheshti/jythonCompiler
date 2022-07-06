@@ -77,8 +77,12 @@ public class HashtablePrinter implements jythonListener{
 
             itemAttribute attrs = new itemAttribute(ctx.name.getLine(), ctx.name.getText(),
             false,false,true,false,false,false);
-    
-            attrs.setStructureType("Field");
+            
+            if(ctx.type.getText().contains("class")){
+                attrs.setStructureType("ClassField");
+            }else{
+                attrs.setStructureType("Field");
+            }
             attrs.setVariableType(ctx.type.getText());
 
             currentScope.insert("Field_"+ctx.name.getText(),attrs);
@@ -94,9 +98,9 @@ public class HashtablePrinter implements jythonListener{
         false,false,true,false,false,false);
         attrs.setVariableType(ctx.type.getText());
         if(ctx.type.getText().contains("class")){
-            attrs.setStructureType("ClassArray_Field");
+            attrs.setStructureType("ClassArrayField");
         }else{
-            attrs.setStructureType("Array_Field");
+            attrs.setStructureType("ArrayField");
         }
 
         currentScope.insert("Field_"+ctx.name.getText(),null);
