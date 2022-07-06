@@ -88,6 +88,9 @@ public class HashtablePrinter implements jythonListener{
             attrs.setVariableType(ctx.type.getText());
 
             currentScope.insert("Field_"+ctx.name.getText(),attrs);
+
+            String type = ctx.CLASSNAME().getText();
+            ErrorDetector.notDefinedClassError(currentScope, type);
         }
     }
 
@@ -106,6 +109,9 @@ public class HashtablePrinter implements jythonListener{
         }
 
         currentScope.insert("Field_"+ctx.name.getText(),null);
+        
+        String type = ctx.CLASSNAME().getText();
+        ErrorDetector.notDefinedClassError(currentScope, type);
     }
 
     @Override
@@ -329,7 +335,8 @@ public class HashtablePrinter implements jythonListener{
     @Override
     public void enterAssignment(jythonParser.AssignmentContext ctx) {
         String prefixexp = ctx.prefixexp().ID().getText();
-        
+        ErrorDetector.notDefinedClassError(currentScope, prefixexp);
+
     }
 
     @Override
