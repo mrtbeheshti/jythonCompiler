@@ -6,6 +6,9 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 public class HashtablePrinter implements jythonListener{
     private Scope currentScope;
     private int paramIndex = 0;
@@ -18,9 +21,19 @@ public class HashtablePrinter implements jythonListener{
 
     @Override
     public void exitProgram(jythonParser.ProgramContext ctx) {
-        System.out.println(currentScope.toString()); 
+        String print_str = "";
+        Queue<Scope> scopes = new LinkedList<>();
+        scopes.add(this.currentScope);
+        while(scopes.size()>0){
+            Scope scope_to_print = scopes.peek();
+            for(int i=0;i<scope_to_print.childrenCount();i++){
+                scopes.add(scope_to_print.getChild(i));
+            }
+            print_str += scope_to_print.toString();
+        }
         ErrorDetector.duplicateFieldError(currentScope);
-        ErrorDetector.duplicateMethodError(currentScope); 
+        ErrorDetector.duplicateMethodError(currentScope);
+        System.out.println(print_str);
     }
 
     @Override
@@ -63,35 +76,22 @@ public class HashtablePrinter implements jythonListener{
 
     @Override
     public void enterVarDec(jythonParser.VarDecContext ctx) {
+        itemAttribute attrs = new itemAttribute(ctx.name.getLine(), ctx.name.getText(),
+        false,false,true,false,false,false);
         if(isParam){
-
-            
-            itemAttribute attrs = new itemAttribute(ctx.name.getLine(), ctx.name.getText(),
-            false,false,true,false,false,false);
-    
             attrs.setStructureType("Parameter");
-            attrs.setVariableType(ctx.type.getText());
-            attrs.setParameterIndex(paramIndex);
-
-            currentScope.insert("Field_"+ctx.name.getText(),attrs);
-
+            this.currentScope.getLastItem().addParameter(ctx.type.getText());
         }else{
 
-            itemAttribute attrs = new itemAttribute(ctx.name.getLine(), ctx.name.getText(),
-            false,false,true,false,false,false);
-            
             if(ctx.type.getText().contains("class")){
                 attrs.setStructureType("ClassField");
             }else{
                 attrs.setStructureType("Field");
             }
-            attrs.setVariableType(ctx.type.getText());
 
-            currentScope.insert("Field_"+ctx.name.getText(),attrs);
-
-            String type = ctx.CLASSNAME().getText();
-            ErrorDetector.notDefinedClassError(currentScope, type);
         }
+        attrs.setVariableType(ctx.type.getText());
+        currentScope.insert("Field_"+ctx.name.getText(),attrs);
     }
 
     @Override
@@ -109,9 +109,6 @@ public class HashtablePrinter implements jythonListener{
         }
 
         currentScope.insert("Field_"+ctx.name.getText(),null);
-        
-        String type = ctx.CLASSNAME().getText();
-        ErrorDetector.notDefinedClassError(currentScope, type);
     }
 
     @Override
@@ -124,7 +121,6 @@ public class HashtablePrinter implements jythonListener{
 
         attrs.setStructureType("Method");
         attrs.setReturnType(ctx.type.getText());
-        attrs.setParameterList(ctx.parameter());
 
         currentScope.insert("Method_"+ctx.name.getText(),attrs);
         paramIndex = 0;
@@ -147,7 +143,6 @@ public class HashtablePrinter implements jythonListener{
         false,false,false,false,false,true);
         
         attrs.setStructureType("Constructor");
-        attrs.setParameterList(ctx.parameter());
         
         currentScope.insert("Constructor_"+ctx.type.getText(),attrs);
         paramIndex = 0;
@@ -250,13 +245,13 @@ public class HashtablePrinter implements jythonListener{
         currentScope=child;
     }
 
+
+//////////////////////////////////////////////////////////////////////////////////
+
     @Override
     public void exitFor_statment(jythonParser.For_statmentContext ctx) {
         currentScope = currentScope.getParent();
     }
-
-
-    //////////////////////////////////////////////////////////////////////////////////
 
     
     @Override
@@ -334,8 +329,6 @@ public class HashtablePrinter implements jythonListener{
 
     @Override
     public void enterAssignment(jythonParser.AssignmentContext ctx) {
-        String prefixexp = ctx.prefixexp().ID().getText();
-        ErrorDetector.notDefinedClassError(currentScope, prefixexp);
 
     }
 

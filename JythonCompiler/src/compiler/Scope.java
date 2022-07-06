@@ -11,6 +11,7 @@ public class Scope{
     private Scope parent=null;
     private ArrayList<Scope> children;
     private int entryLine;
+    private itemAttribute last_item;
 
     public Scope(int line, String name){
         this.symbolTable=new Hashtable<String, itemAttribute>();
@@ -33,9 +34,16 @@ public class Scope{
     public void appendChild(Scope child){
         children.add(child);
     }
+    public int childrenCount(){
+        return this.children.size();
+    }
+    public itemAttribute getLastItem(){
+        return this.last_item;
+    }
     public Scope getChild(int index){return this.children.get(index);}
-    public void insert(String idefName , itemAttribute attributes){
-        symbolTable.put(idefName,attributes);
+    public void insert(String idefName , itemAttribute attribute){
+        this.last_item=attribute;
+        symbolTable.put(idefName,attribute);
     }
     public int getEntryLine(){
         return this.entryLine;
@@ -43,8 +51,18 @@ public class Scope{
     public String getName(){
         return this.name;
     }
-    public String toString(){
-        
+    public String toString() {
+        return "------------- " + name + " : " + this.entryLine + " -------------\n" +
+                printItems() +
+                "-----------------------------------------\n";
     }
-    
+    public String printItems(){
+        String itemsStr = "";
+        Set<Entry<String, itemAttribute>> entrySet
+                = symbolTable.entrySet();
+        for (Entry<String,itemAttribute> entry:entrySet) {
+            itemsStr += "Key = " + entry.getKey() + " | Value = " + entry.getValue().toString() + "\n";
+        }
+        return itemsStr;
+    }
 }
