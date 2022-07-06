@@ -46,7 +46,7 @@ public class Scope{
         return this.name;
     }
     public String toString(){
-        
+        return "";
     }
     
 }

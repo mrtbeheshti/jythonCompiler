@@ -41,19 +41,24 @@ public class itemAttribute {
         this.structureType = structureType;
     }
     public void setClassType(String classType){
-        this.classType = classType;
+        if(this.isClass)
+            this.classType = classType;
     }
     public void setVariableType(String variableType){
-        this.variableType = variableType;
+        if(this.isVariable)
+            this.variableType = variableType;
     }
     public void setParameterList(List<ParameterContext> params){
-        this.parameterList = params;
+        if(this.isMethod || this.isConstructor)
+            this.parameterList = params;
     }
     public void setReturnType(String returnType){
-        this.returnType = returnType;
+        if(this.isMethod)
+            this.returnType = returnType;
     }
     public void setParameterIndex(int index){
-        this.parameteIndex = index;
+        if(this.isVariable)
+            this.parameteIndex = index;
     }
     public void appendParent(String parent){
         if(this.isClass){

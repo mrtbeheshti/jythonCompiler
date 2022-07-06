@@ -1,7 +1,5 @@
 package compiler;
 
-// import compiler.itemAttribute;
-// import compiler.Scope;
 import gen.jythonListener;
 import gen.jythonParser;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -25,10 +23,7 @@ public class HashtablePrinter implements jythonListener{
 
     @Override
     public void enterImportclass(jythonParser.ImportclassContext ctx) {
-        // Scope new_child=new Scope(tempLine);
-        // new_child.setParent(currentScope);
-        // currentScope.appendChild(new_child);
-        // currentScope=new_child;
+
         itemAttribute attrs = new itemAttribute(ctx.imprtedClass.getLine(), ctx.imprtedClass.getText(),
         true,false,false,false,false,false);
         
@@ -38,9 +33,7 @@ public class HashtablePrinter implements jythonListener{
     }
 
     @Override
-    public void exitImportclass(jythonParser.ImportclassContext ctx) {
-        // currentScope = currentScope.getParent();
-    }
+    public void exitImportclass(jythonParser.ImportclassContext ctx) {}
 
     @Override
     public void enterClassDef(jythonParser.ClassDefContext ctx) {
@@ -68,11 +61,6 @@ public class HashtablePrinter implements jythonListener{
 
     @Override
     public void enterVarDec(jythonParser.VarDecContext ctx) {
-        // Scope child=new Scope(tempLine);
-        // child.setParent(currentScope);
-        // currentScope.appendChild(child);
-        // currentScope=child;
-
         if(isParam){
 
             
@@ -98,17 +86,10 @@ public class HashtablePrinter implements jythonListener{
     }
 
     @Override
-    public void exitVarDec(jythonParser.VarDecContext ctx) {
-        // currentScope = currentScope.getParent();
-    }
+    public void exitVarDec(jythonParser.VarDecContext ctx) {}
 
     @Override
     public void enterArrayDec(jythonParser.ArrayDecContext ctx) {
-        // Scope child=new Scope(tempLine);
-        // child.setParent(currentScope);
-        // currentScope.appendChild(child);
-        // currentScope=child;
-
         itemAttribute attrs = new itemAttribute(ctx.name.getLine(), ctx.name.getText(),
         false,false,true,false,false,false);
         attrs.setVariableType(ctx.type.getText());
@@ -122,9 +103,7 @@ public class HashtablePrinter implements jythonListener{
     }
 
     @Override
-    public void exitArrayDec(jythonParser.ArrayDecContext ctx) {
-        // currentScope = currentScope.getParent();
-    }
+    public void exitArrayDec(jythonParser.ArrayDecContext ctx) {}
 
     @Override
     public void enterMethodDec(jythonParser.MethodDecContext ctx) {
@@ -152,16 +131,6 @@ public class HashtablePrinter implements jythonListener{
 
     @Override
     public void enterConstructor(jythonParser.ConstructorContext ctx) {
-        // String className = "";
-        // for(Object key : currentScope.getParent().getSymbolTableKeys()){
-        //     String str = (String)key;
-        //     if (str.contains("lass")){
-        //         className = str.substring(str.indexOf("_")+1, str.length());
-        //         break;
-        //     }
-        // }
-        // currentScope.insert("Constructor_"+className,null);
-
         itemAttribute attrs = new itemAttribute(ctx.start.getLine(), ctx.type.getText(),
         false,false,false,false,false,true);
         
@@ -185,17 +154,6 @@ public class HashtablePrinter implements jythonListener{
 
     @Override
     public void enterParameter(jythonParser.ParameterContext ctx) {
-
-        // String paramName = "";
-        // for(Object key : currentScope.getSymbolTableKeys()){
-        //     String str = (String)key;
-        //     if (str.contains("Method")){
-        //         itemAttribute attrs = currentScope.getsymbolTableValue(str);
-        //         paramName = attrs.getParameterList().get(paramIndex).getText();
-        //         break;
-        //     }
-        // }
-        // currentScope.insert("Field_"+paramName,null);
         isParam = true;
     }
 
@@ -279,6 +237,9 @@ public class HashtablePrinter implements jythonListener{
         currentScope.appendChild(child);
         currentScope=child;
     }
+
+
+//////////////////////////////////////////////////////////////////////////////////
 
     @Override
     public void exitFor_statment(jythonParser.For_statmentContext ctx) {
