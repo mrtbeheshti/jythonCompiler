@@ -1,7 +1,7 @@
 package compiler;
 
-import compiler.itemAttribute;
-import compiler.Scope;
+// import compiler.itemAttribute;
+// import compiler.Scope;
 import gen.jythonListener;
 import gen.jythonParser;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -11,10 +11,11 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 public class HashtablePrinter implements jythonListener{
     private Scope currentScope;
     private int paramIndex = 0;
+    private boolean isParam = false;
 
     @Override
     public void enterProgram(jythonParser.ProgramContext ctx) {
-        currentScope=new Scope(1);
+        currentScope=new Scope(1, "Program");
     }
 
     @Override
@@ -28,7 +29,12 @@ public class HashtablePrinter implements jythonListener{
         // new_child.setParent(currentScope);
         // currentScope.appendChild(new_child);
         // currentScope=new_child;
-        currentScope.insert("import_"+ctx.imprtedClass.getText(),null);
+        itemAttribute attrs = new itemAttribute(ctx.imprtedClass.getLine(), ctx.imprtedClass.getText(),
+        true,false,false,false,false,false);
+        
+        attrs.setStructureType("import");
+
+        currentScope.insert("import_"+ctx.imprtedClass.getText(),attrs);
     }
 
     @Override
@@ -38,11 +44,21 @@ public class HashtablePrinter implements jythonListener{
 
     @Override
     public void enterClassDef(jythonParser.ClassDefContext ctx) {
-        Scope child=new Scope(ctx.className.getLine());
+        itemAttribute attrs = new itemAttribute(ctx.className.getLine(), ctx.className.getText(),
+        false,true,false,false,false,false);
+        
+        attrs.setStructureType("Class");
+
+        for(int i=1;i<ctx.CLASSNAME().toArray().length;i++)
+            attrs.appendParent(ctx.CLASSNAME(i).getText());
+
+        currentScope.insert("Class_"+ctx.className.getText(),attrs);
+
+        Scope child=new Scope(ctx.className.getLine(), ctx.className.getText());
         child.setParent(currentScope);
         currentScope.appendChild(child);
         currentScope=child;
-        currentScope.insert("Class_"+ctx.className.getText(),null);
+        
     }
 
     @Override
@@ -56,7 +72,29 @@ public class HashtablePrinter implements jythonListener{
         // child.setParent(currentScope);
         // currentScope.appendChild(child);
         // currentScope=child;
-        currentScope.insert("Field_"+ctx.name.getText(),null);
+
+        if(isParam){
+
+            
+            itemAttribute attrs = new itemAttribute(ctx.name.getLine(), ctx.name.getText(),
+            false,false,true,false,false,false);
+    
+            attrs.setStructureType("Parameter");
+            attrs.setVariableType(ctx.type.getText());
+            attrs.setParameterIndex(paramIndex);
+
+            currentScope.insert("Field_"+ctx.name.getText(),attrs);
+
+        }else{
+
+            itemAttribute attrs = new itemAttribute(ctx.name.getLine(), ctx.name.getText(),
+            false,false,true,false,false,false);
+    
+            attrs.setStructureType("Field");
+            attrs.setVariableType(ctx.type.getText());
+
+            currentScope.insert("Field_"+ctx.name.getText(),attrs);
+        }
     }
 
     @Override
@@ -70,6 +108,16 @@ public class HashtablePrinter implements jythonListener{
         // child.setParent(currentScope);
         // currentScope.appendChild(child);
         // currentScope=child;
+
+        itemAttribute attrs = new itemAttribute(ctx.name.getLine(), ctx.name.getText(),
+        false,false,true,false,false,false);
+        attrs.setVariableType(ctx.type.getText());
+        if(ctx.type.getText().contains("class")){
+            attrs.setStructureType("ClassArray_Field");
+        }else{
+            attrs.setStructureType("Array_Field");
+        }
+
         currentScope.insert("Field_"+ctx.name.getText(),null);
     }
 
@@ -80,12 +128,20 @@ public class HashtablePrinter implements jythonListener{
 
     @Override
     public void enterMethodDec(jythonParser.MethodDecContext ctx) {
-        Scope child=new Scope(ctx.name.getLine());
+        itemAttribute attrs = new itemAttribute(ctx.name.getLine(), ctx.name.getText(),
+        false,false,false,true,false,false);
+
+        attrs.setStructureType("Method");
+        attrs.setReturnType(ctx.type.getText());
+        attrs.setParameterList(ctx.parameter());
+
+        currentScope.insert("Method_"+ctx.name.getText(),attrs);
+        paramIndex = 0;
+
+        Scope child=new Scope(ctx.name.getLine(), ctx.type.getText());
         child.setParent(currentScope);
         currentScope.appendChild(child);
         currentScope=child;
-        currentScope.insert("Method_"+ctx.name.getText(),null);
-        paramIndex = 0;
     }
 
     @Override
@@ -96,10 +152,6 @@ public class HashtablePrinter implements jythonListener{
 
     @Override
     public void enterConstructor(jythonParser.ConstructorContext ctx) {
-        Scope child=new Scope(ctx.start.getLine());
-        child.setParent(currentScope);
-        currentScope.appendChild(child);
-        currentScope=child;
         // String className = "";
         // for(Object key : currentScope.getParent().getSymbolTableKeys()){
         //     String str = (String)key;
@@ -110,8 +162,19 @@ public class HashtablePrinter implements jythonListener{
         // }
         // currentScope.insert("Constructor_"+className,null);
 
-        currentScope.insert("Constructor_"+ctx.getText(),null);
+        itemAttribute attrs = new itemAttribute(ctx.start.getLine(), ctx.type.getText(),
+        false,false,false,false,false,true);
+        
+        attrs.setStructureType("Constructor");
+        attrs.setParameterList(ctx.parameter());
+        
+        currentScope.insert("Constructor_"+ctx.type.getText(),attrs);
         paramIndex = 0;
+
+        Scope child=new Scope(ctx.start.getLine(), ctx.type.getText());
+        child.setParent(currentScope);
+        currentScope.appendChild(child);
+        currentScope=child;
     }
 
     @Override
@@ -133,19 +196,25 @@ public class HashtablePrinter implements jythonListener{
         //     }
         // }
         // currentScope.insert("Field_"+paramName,null);
-        paramIndex++;
-
-        currentScope.insert("Field_"+ctx.getText(),null);
+        isParam = true;
     }
 
     @Override
     public void exitParameter(jythonParser.ParameterContext ctx) {
-
+        paramIndex++;
+        isParam = false;
     }
 
     @Override
     public void enterIf_statment(jythonParser.If_statmentContext ctx) {
-        Scope child=new Scope(ctx.start.getLine());
+        String name = "";
+        switch(currentScope.getName()){
+            case "If":
+            case "While":
+            case "For": name= "nested"; break;
+            default: name = "If";   
+        }
+        Scope child=new Scope(ctx.start.getLine(), name);
         child.setParent(currentScope);
         currentScope.appendChild(child);
         currentScope=child;
@@ -158,7 +227,14 @@ public class HashtablePrinter implements jythonListener{
 
     @Override
     public void enterWhile_statment(jythonParser.While_statmentContext ctx) {
-        Scope child=new Scope(ctx.start.getLine());
+        String name = "";
+        switch(currentScope.getName()){
+            case "If":
+            case "While":
+            case "For": name= "nested"; break;
+            default: name = "While";   
+        }
+        Scope child=new Scope(ctx.start.getLine(), name);
         child.setParent(currentScope);
         currentScope.appendChild(child);
         currentScope=child;
@@ -171,7 +247,14 @@ public class HashtablePrinter implements jythonListener{
 
     @Override
     public void enterIf_else_statment(jythonParser.If_else_statmentContext ctx) {
-        Scope child=new Scope(ctx.start.getLine());
+        String name = "";
+        switch(currentScope.getName()){
+            case "If":
+            case "While":
+            case "For": name= "nested"; break;
+            default: name = "If";   
+        }
+        Scope child=new Scope(ctx.start.getLine(), name);
         child.setParent(currentScope);
         currentScope.appendChild(child);
         currentScope=child;
@@ -184,7 +267,14 @@ public class HashtablePrinter implements jythonListener{
 
     @Override
     public void enterFor_statment(jythonParser.For_statmentContext ctx) {
-        Scope child=new Scope(ctx.start.getLine());
+        String name = "";
+        switch(currentScope.getName()){
+            case "If":
+            case "While":
+            case "For": name= "nested"; break;
+            default: name = "For";   
+        }
+        Scope child=new Scope(ctx.start.getLine(), name);
         child.setParent(currentScope);
         currentScope.appendChild(child);
         currentScope=child;

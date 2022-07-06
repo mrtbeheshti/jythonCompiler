@@ -1,5 +1,4 @@
 package compiler;
-import compiler.itemAttribute;
 import gen.jythonListener;
 import gen.jythonParser;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -8,17 +7,18 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.Iterator;
 
 public class Scope{
+    private String name;
     private Hashtable<String,itemAttribute> symbolTable;
     private Scope parent=null;
     private ArrayList<Scope> children;
     private int entryLine;
 
-    public Scope(int line){
+    public Scope(int line, String name){
         this.symbolTable=new Hashtable<String, itemAttribute>();
         this.entryLine = line;
+        this.name = name;
     }
     public Object[] getSymbolTableKeys(){
         return this.symbolTable.keySet().toArray();
@@ -41,6 +41,9 @@ public class Scope{
     }
     public int getEntryLine(){
         return this.entryLine;
+    }
+    public String getName(){
+        return this.name;
     }
     
 }
