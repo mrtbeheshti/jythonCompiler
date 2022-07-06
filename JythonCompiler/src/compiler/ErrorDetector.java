@@ -5,16 +5,7 @@ import java.util.Queue;
 
 public class ErrorDetector {
     
-    private static Scope root;
-
-    public static void detect(Scope root){
-        ErrorDetector.root = root;
-        duplicateMethodError();
-        duplicateFieldError();
-        notDefinedClassError();
-        notDefinedVariableError();
-    }
-    private static void duplicateMethodError(){
+    public static void duplicateMethodError(Scope root){
         Queue<Scope> fringe = new LinkedList<>();
         LinkedList<String> visitedMethod = new LinkedList<>();
         fringe.add(root);
@@ -37,7 +28,7 @@ public class ErrorDetector {
         }
     }
 
-    private static void duplicateFieldError(){
+    public static void duplicateFieldError(Scope root){
         Queue<Scope> fringe = new LinkedList<>();
         LinkedList<String> visitedField = new LinkedList<>();
         fringe.add(root);
@@ -61,52 +52,34 @@ public class ErrorDetector {
 
     }
     
-    private static void notDefinedClassError(){
-        Queue<Scope> fringe = new LinkedList<>();
-        LinkedList<String> visitedMethod = new LinkedList<>();
-        fringe.add(root);
-        while(! fringe.isEmpty()){
-            Scope scope = fringe.poll();
-            for(Scope child : scope.getChildrenArrayList()){
-                fringe.add(child);
-            }
-            visitedMethod.clear();
-            for (Object key : scope.getSymbolTableKeys()){
-                itemAttribute attrs = scope.getsymbolTableValue((String)key);
-                if(attrs.getStructureType().equals("Method")){
-                    if(visitedMethod.contains(attrs.getName())){
-                        printError();
-                    }else{
-                        visitedMethod.add(attrs.getName());
+    public static void notDefinedClassError(Scope child, String className){
+        while(child != null){
+            for (Object key : child.getSymbolTableKeys()){
+                itemAttribute attrs = child.getsymbolTableValue((String)key);
+                if(attrs.getStructureType().equals("Class")){
+                    if(attrs.getName().equals(className)){
+                        return;
                     }
                 }
+            child = child.getParent();
             }
         }
-
+        printError();
     }
     
-    private static void notDefinedVariableError(){
-        Queue<Scope> fringe = new LinkedList<>();
-        LinkedList<String> visitedMethod = new LinkedList<>();
-        fringe.add(root);
-        while(! fringe.isEmpty()){
-            Scope scope = fringe.poll();
-            for(Scope child : scope.getChildrenArrayList()){
-                fringe.add(child);
-            }
-            visitedMethod.clear();
-            for (Object key : scope.getSymbolTableKeys()){
-                itemAttribute attrs = scope.getsymbolTableValue((String)key);
-                if(attrs.getStructureType().equals("Method")){
-                    if(visitedMethod.contains(attrs.getName())){
-                        printError();
-                    }else{
-                        visitedMethod.add(attrs.getName());
+    public static void notDefinedVariableError(Scope child, String varName){
+        while(child != null){
+            for (Object key : child.getSymbolTableKeys()){
+                itemAttribute attrs = child.getsymbolTableValue((String)key);
+                if(attrs.getStructureType().contains("Field")){
+                    if(attrs.getName().equals(varName)){
+                        return;
                     }
                 }
+            child = child.getParent();
             }
         }
-
+        printError();
     }
 
     private static void printError(){

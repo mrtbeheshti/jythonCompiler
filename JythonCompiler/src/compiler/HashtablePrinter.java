@@ -18,7 +18,9 @@ public class HashtablePrinter implements jythonListener{
 
     @Override
     public void exitProgram(jythonParser.ProgramContext ctx) {
-        System.out.println(currentScope.toString());  
+        System.out.println(currentScope.toString()); 
+        ErrorDetector.duplicateFieldError(currentScope);
+        ErrorDetector.duplicateMethodError(currentScope); 
     }
 
     @Override
@@ -242,13 +244,13 @@ public class HashtablePrinter implements jythonListener{
         currentScope=child;
     }
 
-
-//////////////////////////////////////////////////////////////////////////////////
-
     @Override
     public void exitFor_statment(jythonParser.For_statmentContext ctx) {
         currentScope = currentScope.getParent();
     }
+
+
+    //////////////////////////////////////////////////////////////////////////////////
 
     
     @Override
@@ -326,7 +328,8 @@ public class HashtablePrinter implements jythonListener{
 
     @Override
     public void enterAssignment(jythonParser.AssignmentContext ctx) {
-
+        String prefixexp = ctx.prefixexp().ID().getText();
+        
     }
 
     @Override
