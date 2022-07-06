@@ -19,7 +19,7 @@ public class ErrorDetector {
                 itemAttribute attrs = scope.getsymbolTableValue((String)key);
                 if(attrs.getStructureType().equals("Method")){
                     if(visitedMethod.contains(attrs.getName())){
-                        printError();
+                        printError("","","","");
                     }else{
                         visitedMethod.add(attrs.getName());
                     }
@@ -42,7 +42,7 @@ public class ErrorDetector {
                 itemAttribute attrs = scope.getsymbolTableValue((String)key);
                 if(attrs.getStructureType().contains("Field")){
                     if(visitedField.contains(attrs.getName())){
-                        printError();
+                        printError("","","","");
                     }else{
                         visitedField.add(attrs.getName());
                     }
@@ -64,7 +64,7 @@ public class ErrorDetector {
             child = child.getParent();
             }
         }
-        printError();
+        printError("","","","");
     }
     
     public static void notDefinedVariableError(Scope child, String varName){
@@ -79,10 +79,10 @@ public class ErrorDetector {
             child = child.getParent();
             }
         }
-        printError();
+        printError("","","","");
     }
 
-    private static String printError(String type, String line, String column, String text){
-        System.out.println("Error" + type + " : in line " + line + ":" + column + " , " + text;);
+    private static void printError(String type, String line, String column, String text){
+        System.out.println("Error" + type + " : in line " + line + ":" + column + " , " + text);
     }
 }

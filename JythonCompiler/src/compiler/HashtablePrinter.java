@@ -97,7 +97,13 @@ public class HashtablePrinter implements jythonListener{
             if(ctx.type.getText().contains("class")){
                 attrs.setStructureType("ClassField");
             }else{
-                attrs.setStructureType("Field");
+                String scopeName = this.currentScope.getName();
+                Scope item = this.currentScope.getParent();
+                if(item.getsymbolTableValue("Class_"+scopeName) != null){
+                    attrs.setStructureType("Field");
+                }
+                else
+                    attrs.setStructureType("MethodField");
             }
 
         }

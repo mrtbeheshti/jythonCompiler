@@ -20,7 +20,7 @@ bool isHungry
  Drink water
  while(self.isHungry){
  Food newFood = Food()
- if(1){
+ if(mamad){
  int a
  }
  eat(newFood)
